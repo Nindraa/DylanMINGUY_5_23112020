@@ -168,7 +168,6 @@ function addToLocalStorage(event){
         priceProductCart : priceProduct.innerHTML,
         lensesChoiceCart : lensesChoices.innerHTML
         };
-    console.log(optionProduct)
 
     if(localStorage.getItem("LocalStorageCartProducts")){
 
@@ -176,6 +175,7 @@ function addToLocalStorage(event){
         productToStorage = [];
         productToStorage.push(optionProduct)
         localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
+        console.log(optionProduct)
     }
 }
 
