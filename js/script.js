@@ -17,6 +17,18 @@ async function getProducts () {
     return data;
 }
 
+// Création du panier
+
+let productToStorage = JSON.parse(localStorage.getItem("localStorageCartProducts"));
+
+// Création du LocalStorage
+
+if(productToStorage){
+
+} else {
+    productToStorage = [];
+    localStorage.setItem("localStorageCartProducts", JSON.stringify(productToStorage))
+}
 
 async function getIndex() {
     if (indexCam != null) {
@@ -113,8 +125,6 @@ async function pageProduct(){
     }
 }
 
-console.log(lensesChoices)
-
 // Evenement onclick pour appel de produit
 
 indexLink = document.getElementsByClassName("stretched-link")
@@ -122,32 +132,23 @@ indexLink = addEventListener('click', pageProduct())
 
 // Evenement localStorage
 
-let productToStorage = JSON.parse(localStorage.getItem("LocalStorageCartProducts"));
-
 if (document.getElementById("buttonProduct") != null) {
     let addToLocalStorageButton = document.querySelector("#buttonProduct");
     addToLocalStorageButton.addEventListener("click", addToLocalStorage)
-
-    async function addToLocalStorage(){
-        console.log("Le bouton marche");
-        const allProducts = await getProducts()
-
-        if(productToStorage){
-            productToStorage = [];
-            productToStorage.push(allProducts)
-            localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
-        } else {
-            productToStorage = [];
-            productToStorage.push(allProducts)
-            localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
-        }
-    }
 }
 
 
 
+async function addToLocalStorage(){
+    console.log("Le bouton marche");
+    const allProducts = await getProducts()
 
-
+    productToStorage.push(allProducts)
+    localStorage.setItem("localStorageCartProducts", JSON.stringify(productToStorage))
+    
+    console.log('Ajout au panier réussi !')
+    console.log(productToStorage + " sont dans le panier")
+}
 
 // Panier
 
@@ -182,14 +183,8 @@ function ready () {
 const productCartItem = document.getElementById("productCartItem");
 
 function cartItem() {
-    console.log("allo?")
+    if(productToStorage.length > 0 && productCartItem != null) {
 
-    if(productToStorage.length < 0 && productCartItem != null) {
-        let emptyCart = document.createElement("p")
-        emptyCart.innerHTML = "Votre panier est vide."
-        console.log("La panier est vide");
-
-    } else {
         console.log(productToStorage)
         for (i = 0; i < productToStorage.length; i++) {
             
@@ -243,6 +238,14 @@ function cartItem() {
             removeProductCart.innerHTML = "Supprimer"
         }
 
+    } else {
+
+        let emptyCart = document.createElement("p");
+
+        productCartItem.appendChild(emptyCart);
+        emptyCart.innerHTML = "Votre panier est vide.";
+        console.log("La panier est vide");
+
     }
 
 }
@@ -259,6 +262,8 @@ function quantityChanged(event) {
 function removeCartItem(event){
     let buttonClicked = event.target
     buttonClicked.parentElement.parentElement.remove()
+    localStorage.removeItem("localStorageCartProducts")
+    console.log(localStorage)
     updateCartTotal()
 }
 
