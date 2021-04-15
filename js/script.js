@@ -120,6 +120,30 @@ console.log(lensesChoices)
 indexLink = document.getElementsByClassName("stretched-link")
 indexLink = addEventListener('click', pageProduct())
 
+// Evenement localStorage
+
+let productToStorage = JSON.parse(localStorage.getItem("LocalStorageCartProducts"));
+
+if (document.getElementById("buttonProduct") != null) {
+    let addToLocalStorageButton = document.querySelector("#buttonProduct");
+    addToLocalStorageButton.addEventListener("click", addToLocalStorage)
+
+    async function addToLocalStorage(){
+        console.log("Le bouton marche");
+        const allProducts = await getProducts()
+
+        if(productToStorage){
+            productToStorage = [];
+            productToStorage.push(allProducts)
+            localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
+        } else {
+            productToStorage = [];
+            productToStorage.push(allProducts)
+            localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
+        }
+    }
+}
+
 
 
 
@@ -127,6 +151,8 @@ indexLink = addEventListener('click', pageProduct())
 
 // Panier
 
+
+const productCart = document.getElementById("sectionCart");
 
 
 if(document.readyState == 'loading'){
@@ -136,6 +162,9 @@ if(document.readyState == 'loading'){
 }
 
 function ready () {
+
+    cartItem()
+
     let removeButton = document.getElementsByClassName("btn-danger");
     for (let i = 0; i < removeButton.length; i++) {
         let button = removeButton[i]
@@ -148,68 +177,75 @@ function ready () {
         input.addEventListener("change", quantityChanged)
     } 
     
-    let addToLocalStorageButton = document.querySelector("#buttonProduct");
-    addToLocalStorageButton.addEventListener("click", addToLocalStorage)
-
-    let addToCartButton = document.getElementById("buttonProduct");
-    addToCartButton.addEventListener("click", addToCartItem)
 }
 
-    
-function addToLocalStorage(event){
-    event.preventDefault()
-            
-    let productToStorage = JSON.parse(localStorage.getItem("LocalStorageCartProducts"));
-    console.log(productToStorage)
+const productCartItem = document.getElementById("productCartItem");
 
-    let optionProduct = {
-        pictureProductCart : pictureProduct.src,
-        nameProductCart : nameProduct.innerHTML,
-        priceProductCart : priceProduct.innerHTML,
-        lensesChoiceCart : lensesChoices.innerHTML
-        };
+function cartItem() {
+    console.log("allo?")
 
-    if(localStorage.getItem("LocalStorageCartProducts")){
+    if(productToStorage.length < 0 && productCartItem != null) {
+        let emptyCart = document.createElement("p")
+        emptyCart.innerHTML = "Votre panier est vide."
+        console.log("La panier est vide");
 
     } else {
-        productToStorage = [];
-        productToStorage.push(optionProduct)
-        localStorage.setItem("LocalStorageCartProducts", JSON.stringify(productToStorage))
-        console.log(optionProduct)
+        console.log(productToStorage)
+        for (i = 0; i < productToStorage.length; i++) {
+            
+            let rowCartItem = document.createElement("div");
+            let colPictureProductCart = document.createElement("div");
+            let pictureProductCart = document.createElement("img");
+            let colTitleProductCart = document.createElement("div");
+            let titleProductCart = document.createElement("h3");
+            let lensesProductCart = document.createElement("p");
+            let colSpace = document.createElement("div");
+            let colSpace2 = document.createElement("div");
+            let colPriceProductCart = document.createElement("div");
+            let priceProductCart = document.createElement("h3");
+            let colQuantityProductCart = document.createElement("div");
+            let quantityProductCart = document.createElement("input");
+            let colRemoveProductCart = document.createElement("div");
+            let removeProductCart = document.createElement("button");
+    
+            productCartItem.appendChild(rowCartItem);
+            rowCartItem.classList.add("row", "rowCartItem");
+            rowCartItem.appendChild(colPictureProductCart);
+            colPictureProductCart.classList.add("col-2");
+            colPictureProductCart.appendChild(pictureProductCart);
+            pictureProductCart.classList.add("img-fluid");
+            pictureProductCart.setAttribute ("src", productToStorage[i].imageUrl);
+            rowCartItem.appendChild(colTitleProductCart);
+            colTitleProductCart.classList.add("col-3");
+            colTitleProductCart.appendChild(titleProductCart);
+            titleProductCart.innerHTML = productToStorage[i].name;
+            colTitleProductCart.appendChild(lensesProductCart);
+            rowCartItem.appendChild(colSpace);
+            colSpace.classList.add("col-1");
+            rowCartItem.appendChild(colPriceProductCart);
+            colPriceProductCart.classList.add("col-2");
+            colPriceProductCart.appendChild(priceProductCart);
+            priceProductCart.innerHTML = productToStorage[i].price;
+            priceProductCart.classList.add("priceProductCart")
+            rowCartItem.appendChild(colSpace2);
+            colSpace2.classList.add("col-1");
+            rowCartItem.appendChild(colQuantityProductCart);
+            colQuantityProductCart.classList.add("col-2");
+            colQuantityProductCart.appendChild(quantityProductCart);
+            quantityProductCart.classList.add("quantityProductCart");
+            quantityProductCart.setAttribute("type", "number");
+            quantityProductCart.setAttribute("value", 1);
+            rowCartItem.appendChild(colRemoveProductCart);
+            colRemoveProductCart.classList.add("col-1", "text-right");
+            colRemoveProductCart.appendChild(removeProductCart);
+            removeProductCart.classList.add("btn", "btn-danger");
+            removeProductCart.setAttribute("type", "button");
+            removeProductCart.innerHTML = "Supprimer"
+        }
+
     }
+
 }
-
-function addToCartItem() {
-    let rowCart = document.createElement("div");
-    rowCart.classList.add("rowCart")
-    let productCart = document.getElementsByClassName("rowCartItem")[0]
-    let rowCartContents = `
-        <div class="row rowCartItem">
-            <div class="col-2 border-bottom border-secondary border-2 pb-3 pictureProduct">
-                <img class="img-fluid" src="${optionProduct.nameProductCart}" alt="Image caméra" />
-            </div>
-            <div class="col-3 border-bottom border-secondary border-2 pb-3">
-                <h3 class="titleProduct"></h3>
-            </div>
-            <div class="col-1"></div>
-            <div class="col-2 border-bottom border-secondary border-2 pb-3">
-                <h3 class="priceProduct"></h3>
-            </div>
-            <div class="col-1"></div>
-            <div class="col-1 border-bottom border-secondary border-2 pb-3">
-                <input class="quantityProduct" type="number" value="2">
-            </div>
-            <div class="col-2 border-bottom border-secondary border-2 pb-3 text-right">
-                <button class="btn btn-danger" type="button">Supprimer</button>
-            </div>
-        </div>`
-    rowCart.innerHTML = rowCartContents
-    productCart.append(rowCart)
-}
-
-
-
-
 
 
 function quantityChanged(event) {
