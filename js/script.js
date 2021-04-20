@@ -1,4 +1,3 @@
-
 // Url produit
 let urlProduct = "";
 
@@ -215,6 +214,7 @@ function cartItem() {
             colTitleProductCart.appendChild(titleProductCart);
             titleProductCart.innerHTML = productToStorage[i].name;
             colTitleProductCart.appendChild(lensesProductCart);
+            lensesProductCart.innerHTML = productToStorage[i].lenses;
             rowCartItem.appendChild(colSpace);
             colSpace.classList.add("col-1");
             rowCartItem.appendChild(colPriceProductCart);
@@ -284,4 +284,238 @@ function updateCartTotal() {
     document.getElementsByClassName("totalPriceCart")[0].innerText = total + "€"
 }
 
+
+// Affichage formulaire
+const affichageDuFormulaire = function () {
+    const positionForm = document.getElementById("positionForm");
+    const formContent = 
+        `<form id="formValidation" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="Last name" class="form-label">Nom :</label>
+                    <span id="erreurNom" class="text-danger"></span>
+                    <input id="lastNameOrder" type="text" class="form-control" required/>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="First name" class="form-label">Prénom :</label>
+                    <span id="erreurPrenom" class="text-danger"></span>
+                    <input id="firstNameOrder" type="text" class="form-control" required/>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="Adress" class="form-label">Adresse :</label>
+                    <span id="erreurAdresse" class="text-danger"></span>
+                    <input id="adressOrder" type="text" class="form-control" required/>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="City" class="form-label">Ville :</label>
+                    <span id="erreurVille" class="text-danger"></span>
+                    <input id="cityOrder" type="text" class="form-control" required/>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="postcode" class="form-label">Code postal :</label>
+                    <span id="erreurCodePostal" class="text-danger"></span>
+                    <input id="postCodeOrder" type="number" class="form-control" required/>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <label for="Email" class="form-label">Email :</label>
+                    <span id="erreurEmail" class="text-danger"></span>
+                    <input id="emailOrder" type="email" class="form-control" required placeholder="exemple@domaine.fr/com"/>
+                </div>
+            </div>
+        </form>`;
+    
+    positionForm.insertAdjacentHTML("afterbegin", formContent);
+};
+
+affichageDuFormulaire();
+
+
+
+// Récupération des données du formulaire + envoie LocalStorage
+const buttonOrder = document.getElementById("buttonOrder");
+buttonOrder.addEventListener("click", sendToLocalStorage)
+
+function sendToLocalStorage(event){
+    event.preventDefault()
+
+    const objectForm = {
+        prenom : document.getElementById("firstNameOrder").value,
+        nom : document.getElementById("lastNameOrder").value,
+        adresse : document.getElementById("adressOrder").value,
+        ville : document.getElementById("cityOrder").value,
+        codePostal : document.getElementById("postCodeOrder").value,
+        email : document.getElementById("emailOrder").value,
+    }
+
+    // Verification du panier
+    const cartCheck = function() {
+        if(JSON.parse(localStorage.getItem("localStorageCartProducts")) == null || JSON.parse(localStorage.getItem("localStorageCartProducts")).length > 1) {
+            alert("Votre panier est vide")
+            window.location.href = "panier.html"
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    //Vérification du formulaire
+    const regexPrenomNomVille = function(value) {
+        return /^([A-Za-z]{3,20})?([-]{0,1})([A-Za-z]{3,20})$/.test(value);
+    }
+
+    const regexCodePostal = function(value) {
+        return /^[0-9]{5}$/.test(value);
+    }
+
+    const regexEmail = function(value) {
+        return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value);
+    }
+
+    const regexAdresse = function(value) {
+        return /^[A-Za-z0-9\s]{5,50}$/.test(value);
+    }
+
+    function prenomCheck() {
+        const verifPrenom = objectForm.prenom;
+        if (regexPrenomNomVille(verifPrenom)) {
+            document.querySelector("#erreurPrenom").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurPrenom").textContent = "Le prénom ne peut contenir que des lettres, de 3 à 20 caractères.";
+            return false
+        }
+    }
+
+    function nomCheck() {
+        const verifNom = objectForm.nom;
+        if (regexPrenomNomVille(verifNom)) {
+            document.querySelector("#erreurNom").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurNom").textContent = "Le nom ne peut contenir que des lettres, de 3 à 20 caractères.";
+            return false
+        }
+    }
+
+    function villeCheck() {
+        const verifVille = objectForm.ville;
+        if (regexPrenomNomVille(verifVille)) {
+            document.querySelector("#erreurVille").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurVille").textContent = "La ville ne peut contenir que des lettres, de 3 à 20 caractères.";
+            return false
+        }
+    }
+
+    function postCodeCheck() {
+        const verifCodePostal = objectForm.codePostal;
+        if (regexCodePostal(verifCodePostal)) {
+            document.querySelector("#erreurCodePostal").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurCodePostal").textContent = "Le code postal doit être composé de 5 chiffres.";
+            return false
+        }
+    }
+
+    function emailCheck() {
+        const verifEmail = objectForm.email;
+        if(regexEmail(verifEmail)){
+            document.querySelector("#erreurEmail").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurEmail").textContent = "L'email doit etre au format : exemple@domaine.fr/com";
+            return false;
+        }
+    }
+
+    function adressCheck() {
+        const verifAdresse = objectForm.adresse;
+        if(regexAdresse(verifAdresse)){
+            document.querySelector("#erreurAdresse").textContent = "";
+            return true;
+        } else {
+            document.querySelector("#erreurAdresse").textContent = "L'adresse ne peut contenir que des chiffres, des lettres et des espaces. Pas de ponctuation.";
+            return false;
+        }
+    }
+
+    const formCheck = function () {
+        if (prenomCheck() == true && nomCheck() == true && villeCheck() == true && postCodeCheck() == true && emailCheck() == true && adressCheck() == true) {
+            localStorage.setItem("objectForm", JSON.stringify(objectForm));
+            return objectForm
+        } else {
+            alert("Veuillez remplir correctement le formulaire");
+        }
+    }
+
+    const aEnvoyer = {
+        productToStorage,
+        objectForm,
+    }
+    console.log(aEnvoyer)
+
+    const envoieAPI = fetch ("http://localhost:3000/api/cameras/order", {
+    method : "POST",
+    body : JSON.stringify(aEnvoyer),
+    headers : {
+                "content-type" : "application/json",
+        }
+    });
+
+        console.log(envoieAPI);
+}
+
+
+
+
+//Préremplir le formulaire avec localStorage
+
+const dataLocalStorage = localStorage.getItem("objectForm");
+
+const dataLocalStorageJson = JSON.parse(dataLocalStorage)
+
+function preRemplirLesInputsAvecLocalStorage () {
+    if(dataLocalStorageJson == null) {
+        console.log("Le LocalStorage est vide")
+    } else {
+        document.querySelector("#firstNameOrder").value = dataLocalStorageJson.prenom;
+        document.querySelector("#lastNameOrder").value = dataLocalStorageJson.nom;
+        document.querySelector("#adressOrder").value = dataLocalStorageJson.adresse;
+        document.querySelector("#cityOrder").value = dataLocalStorageJson.ville;
+        document.querySelector("#postCodeOrder").value = dataLocalStorageJson.codePostal;
+        document.querySelector("#emailOrder").value = dataLocalStorageJson.email;
+    }
+}
+
+preRemplirLesInputsAvecLocalStorage("firstNameOrder");
+preRemplirLesInputsAvecLocalStorage("lastNameOrder");
+preRemplirLesInputsAvecLocalStorage("adressOrder");
+preRemplirLesInputsAvecLocalStorage("cityOrder");
+preRemplirLesInputsAvecLocalStorage("postCodeOrder");
+preRemplirLesInputsAvecLocalStorage("emailOrder");
+
+
+    
+
+
+
+// Page de confirmation et envoie de formulaire
+
+
+// Check si le panier est vide
+
+// Envoie des données du formulaire à l'API
 
