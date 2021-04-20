@@ -353,7 +353,7 @@ function sendToLocalStorage(event){
 
     // Verification du panier
     const cartCheck = function() {
-        if(JSON.parse(localStorage.getItem("localStorageCartProducts")) == null || JSON.parse(localStorage.getItem("localStorageCartProducts")).length > 1) {
+        if(JSON.parse(localStorage.getItem("localStorageCartProducts")) == null || JSON.parse(localStorage.getItem("localStorageCartProducts")).length < 1) {
             alert("Votre panier est vide")
             window.location.href = "panier.html"
             return false;
