@@ -18,15 +18,15 @@ async function getProducts () {
 
 // Création du panier
 
-let productToStorage = JSON.parse(localStorage.getItem("localStorageCartProducts"));
+let cartProducts = JSON.parse(localStorage.getItem("localStorageCartProducts"));
 
 // Création du LocalStorage
 
-if(productToStorage){
+if(cartProducts){
 
 } else {
-    productToStorage = [];
-    localStorage.setItem("localStorageCartProducts", JSON.stringify(productToStorage))
+    cartProducts = [];
+    localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts))
 }
 
 async function getIndex() {
@@ -142,11 +142,11 @@ async function addToLocalStorage(){
     console.log("Le bouton marche");
     const allProducts = await getProducts()
 
-    productToStorage.push(allProducts)
-    localStorage.setItem("localStorageCartProducts", JSON.stringify(productToStorage))
+    cartProducts.push(allProducts)
+    localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts))
     
     console.log('Ajout au panier réussi !')
-    console.log(productToStorage + " sont dans le panier")
+    console.log(cartProducts + " sont dans le panier")
 }
 
 // Panier
@@ -182,10 +182,10 @@ function ready () {
 const productCartItem = document.getElementById("productCartItem");
 
 function cartItem() {
-    if(productToStorage.length > 0 && productCartItem != null) {
+    if(cartProducts.length > 0 && productCartItem != null) {
 
-        console.log(productToStorage)
-        for (i = 0; i < productToStorage.length; i++) {
+        console.log(cartProducts)
+        for (i = 0; i < cartProducts.length; i++) {
             
             let rowCartItem = document.createElement("div");
             let colPictureProductCart = document.createElement("div");
@@ -208,19 +208,19 @@ function cartItem() {
             colPictureProductCart.classList.add("col-2");
             colPictureProductCart.appendChild(pictureProductCart);
             pictureProductCart.classList.add("img-fluid");
-            pictureProductCart.setAttribute ("src", productToStorage[i].imageUrl);
+            pictureProductCart.setAttribute ("src", cartProducts[i].imageUrl);
             rowCartItem.appendChild(colTitleProductCart);
             colTitleProductCart.classList.add("col-3");
             colTitleProductCart.appendChild(titleProductCart);
-            titleProductCart.innerHTML = productToStorage[i].name;
+            titleProductCart.innerHTML = cartProducts[i].name;
             colTitleProductCart.appendChild(lensesProductCart);
-            lensesProductCart.innerHTML = productToStorage[i].lenses;
+            lensesProductCart.innerHTML = cartProducts[i].lenses;
             rowCartItem.appendChild(colSpace);
             colSpace.classList.add("col-1");
             rowCartItem.appendChild(colPriceProductCart);
             colPriceProductCart.classList.add("col-2");
             colPriceProductCart.appendChild(priceProductCart);
-            priceProductCart.innerHTML = productToStorage[i].price;
+            priceProductCart.innerHTML = cartProducts[i].price;
             priceProductCart.classList.add("priceProductCart")
             rowCartItem.appendChild(colSpace2);
             colSpace2.classList.add("col-1");
@@ -320,13 +320,6 @@ const affichageDuFormulaire = function () {
             </div>
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-8">
-                    <label for="postcode" class="form-label">Code postal :</label>
-                    <span id="erreurCodePostal" class="text-danger"></span>
-                    <input id="postCodeOrder" type="number" class="form-control" required/>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
                     <label for="Email" class="form-label">Email :</label>
                     <span id="erreurEmail" class="text-danger"></span>
                     <input id="emailOrder" type="email" class="form-control" required placeholder="exemple@domaine.fr/com"/>
@@ -339,7 +332,9 @@ const affichageDuFormulaire = function () {
 
 affichageDuFormulaire();
 
-
+let contact = {}
+let products = []
+let sendValues
 
 // Récupération des données du formulaire + envoie LocalStorage
 const buttonOrder = document.getElementById("buttonOrder");
@@ -348,12 +343,11 @@ buttonOrder.addEventListener("click", sendToLocalStorage)
 function sendToLocalStorage(event){
     event.preventDefault()
 
-    const objectForm = {
-        prenom : document.getElementById("firstNameOrder").value,
-        nom : document.getElementById("lastNameOrder").value,
-        adresse : document.getElementById("adressOrder").value,
-        ville : document.getElementById("cityOrder").value,
-        codePostal : document.getElementById("postCodeOrder").value,
+    const contact = {
+        firstName : document.getElementById("firstNameOrder").value,
+        lastName : document.getElementById("lastNameOrder").value,
+        address : document.getElementById("adressOrder").value,
+        city : document.getElementById("cityOrder").value,
         email : document.getElementById("emailOrder").value,
     }
 
@@ -373,11 +367,6 @@ function sendToLocalStorage(event){
     const regexPrenomNomVille = function(value) {
         return /^([A-Za-z]{3,20})?([-]{0,1})([A-Za-z]{3,20})$/.test(value);
     }
-
-    const regexCodePostal = function(value) {
-        return /^[0-9]{5}$/.test(value);
-    }
-
     const regexEmail = function(value) {
         return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value);
     }
@@ -387,7 +376,7 @@ function sendToLocalStorage(event){
     }
 
     function prenomCheck() {
-        const verifPrenom = objectForm.prenom;
+        const verifPrenom = contact.firstName;
         if (regexPrenomNomVille(verifPrenom)) {
             document.querySelector("#erreurPrenom").textContent = "";
             return true;
@@ -398,7 +387,7 @@ function sendToLocalStorage(event){
     }
 
     function nomCheck() {
-        const verifNom = objectForm.nom;
+        const verifNom = contact.lastName;
         if (regexPrenomNomVille(verifNom)) {
             document.querySelector("#erreurNom").textContent = "";
             return true;
@@ -409,7 +398,7 @@ function sendToLocalStorage(event){
     }
 
     function villeCheck() {
-        const verifVille = objectForm.ville;
+        const verifVille = contact.city;
         if (regexPrenomNomVille(verifVille)) {
             document.querySelector("#erreurVille").textContent = "";
             return true;
@@ -419,19 +408,8 @@ function sendToLocalStorage(event){
         }
     }
 
-    function postCodeCheck() {
-        const verifCodePostal = objectForm.codePostal;
-        if (regexCodePostal(verifCodePostal)) {
-            document.querySelector("#erreurCodePostal").textContent = "";
-            return true;
-        } else {
-            document.querySelector("#erreurCodePostal").textContent = "Le code postal doit être composé de 5 chiffres.";
-            return false
-        }
-    }
-
     function emailCheck() {
-        const verifEmail = objectForm.email;
+        const verifEmail = contact.email;
         if(regexEmail(verifEmail)){
             document.querySelector("#erreurEmail").textContent = "";
             return true;
@@ -442,7 +420,7 @@ function sendToLocalStorage(event){
     }
 
     function adressCheck() {
-        const verifAdresse = objectForm.adresse;
+        const verifAdresse = contact.address;
         if(regexAdresse(verifAdresse)){
             document.querySelector("#erreurAdresse").textContent = "";
             return true;
@@ -453,29 +431,47 @@ function sendToLocalStorage(event){
     }
 
     const formCheck = function () {
-        if (prenomCheck() == true && nomCheck() == true && villeCheck() == true && postCodeCheck() == true && emailCheck() == true && adressCheck() == true) {
-            localStorage.setItem("objectForm", JSON.stringify(objectForm));
-            return objectForm
+        if (prenomCheck() == true && nomCheck() == true && villeCheck() == true && emailCheck() == true && adressCheck() == true) {
+            localStorage.setItem("contact", JSON.stringify(contact));
+            return contact
         } else {
             alert("Veuillez remplir correctement le formulaire");
         }
     }
 
-    const aEnvoyer = {
-        productToStorage,
-        objectForm,
-    }
-    console.log(aEnvoyer)
+    formCheck();
 
-    const envoieAPI = fetch ("http://localhost:3000/api/cameras/order", {
-    method : "POST",
-    body : JSON.stringify(aEnvoyer),
-    headers : {
-                "content-type" : "application/json",
+
+
+    let sendAPI = function () {
+        if (cartCheck() == true && formCheck() != false) {
+            cartProducts.forEach(function(product) {
+                products.push(product._id)
+            })
+
+            let values = {
+                contact,
+                products,
+            }
+
+            let sendValues = JSON.stringify(values)
+            console.log(sendValues)
+
+
+
+            const envoieAPI = fetch ("http://localhost:3000/api/cameras/order", {
+                method : "POST",
+                body : JSON.stringify(sendValues),
+                headers : {
+                            "content-type" : "application/json",
+                }
+            });
+            
+            console.log(sendValues);
         }
-    });
+    }
 
-        console.log(envoieAPI);
+    sendAPI();
 }
 
 
@@ -483,7 +479,7 @@ function sendToLocalStorage(event){
 
 //Préremplir le formulaire avec localStorage
 
-const dataLocalStorage = localStorage.getItem("objectForm");
+const dataLocalStorage = localStorage.getItem("contact");
 
 const dataLocalStorageJson = JSON.parse(dataLocalStorage)
 
@@ -491,11 +487,10 @@ function preRemplirLesInputsAvecLocalStorage () {
     if(dataLocalStorageJson == null) {
         console.log("Le LocalStorage est vide")
     } else {
-        document.querySelector("#firstNameOrder").value = dataLocalStorageJson.prenom;
-        document.querySelector("#lastNameOrder").value = dataLocalStorageJson.nom;
-        document.querySelector("#adressOrder").value = dataLocalStorageJson.adresse;
-        document.querySelector("#cityOrder").value = dataLocalStorageJson.ville;
-        document.querySelector("#postCodeOrder").value = dataLocalStorageJson.codePostal;
+        document.querySelector("#firstNameOrder").value = dataLocalStorageJson.firstName;
+        document.querySelector("#lastNameOrder").value = dataLocalStorageJson.lastName;
+        document.querySelector("#adressOrder").value = dataLocalStorageJson.address;
+        document.querySelector("#cityOrder").value = dataLocalStorageJson.city;
         document.querySelector("#emailOrder").value = dataLocalStorageJson.email;
     }
 }
@@ -504,7 +499,6 @@ preRemplirLesInputsAvecLocalStorage("firstNameOrder");
 preRemplirLesInputsAvecLocalStorage("lastNameOrder");
 preRemplirLesInputsAvecLocalStorage("adressOrder");
 preRemplirLesInputsAvecLocalStorage("cityOrder");
-preRemplirLesInputsAvecLocalStorage("postCodeOrder");
 preRemplirLesInputsAvecLocalStorage("emailOrder");
 
 
