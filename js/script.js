@@ -1,3 +1,4 @@
+
 // Url produit
 let urlProduct = "";
 
@@ -238,7 +239,7 @@ function cartItem() {
             removeProductCart.innerHTML = "Supprimer"
         }
 
-    } else {
+    } else if (cartProducts.length < 1) {
 
         let emptyCart = document.createElement("p");
 
@@ -288,46 +289,48 @@ function updateCartTotal() {
 // Affichage formulaire
 const affichageDuFormulaire = function () {
     const positionForm = document.getElementById("positionForm");
-    const formContent = 
-        `<form id="formValidation" method="POST">
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
-                    <label for="Last name" class="form-label">Nom :</label>
-                    <span id="erreurNom" class="text-danger"></span>
-                    <input id="lastNameOrder" type="text" class="form-control" required/>
+    if(positionForm != null) {
+        const formContent = 
+            `<form id="formValidation" method="POST">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <label for="Last name" class="form-label">Nom :</label>
+                        <span id="erreurNom" class="text-danger"></span>
+                        <input id="lastNameOrder" type="text" class="form-control" required/>
+                    </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
-                    <label for="First name" class="form-label">Prénom :</label>
-                    <span id="erreurPrenom" class="text-danger"></span>
-                    <input id="firstNameOrder" type="text" class="form-control" required/>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <label for="First name" class="form-label">Prénom :</label>
+                        <span id="erreurPrenom" class="text-danger"></span>
+                        <input id="firstNameOrder" type="text" class="form-control" required/>
+                    </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
-                    <label for="Adress" class="form-label">Adresse :</label>
-                    <span id="erreurAdresse" class="text-danger"></span>
-                    <input id="adressOrder" type="text" class="form-control" required/>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <label for="Adress" class="form-label">Adresse :</label>
+                        <span id="erreurAdresse" class="text-danger"></span>
+                        <input id="adressOrder" type="text" class="form-control" required/>
+                    </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
-                    <label for="City" class="form-label">Ville :</label>
-                    <span id="erreurVille" class="text-danger"></span>
-                    <input id="cityOrder" type="text" class="form-control" required/>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <label for="City" class="form-label">Ville :</label>
+                        <span id="erreurVille" class="text-danger"></span>
+                        <input id="cityOrder" type="text" class="form-control" required/>
+                    </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-8">
-                    <label for="Email" class="form-label">Email :</label>
-                    <span id="erreurEmail" class="text-danger"></span>
-                    <input id="emailOrder" type="email" class="form-control" required placeholder="exemple@domaine.fr/com"/>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <label for="Email" class="form-label">Email :</label>
+                        <span id="erreurEmail" class="text-danger"></span>
+                        <input id="emailOrder" type="email" class="form-control" required placeholder="exemple@domaine.fr/com"/>
+                    </div>
                 </div>
-            </div>
-        </form>`;
-    
-    positionForm.insertAdjacentHTML("afterbegin", formContent);
+            </form>`;
+        
+        positionForm.insertAdjacentHTML("afterbegin", formContent);
+    }
 };
 
 affichageDuFormulaire();
@@ -337,8 +340,11 @@ let products = []
 let sendValues
 
 // Récupération des données du formulaire + envoie LocalStorage
-const buttonOrder = document.getElementById("buttonOrder");
-buttonOrder.addEventListener("click", sendToLocalStorage)
+
+if (document.getElementById("buttonOrder") != null) {
+    const buttonOrder = document.getElementById("buttonOrder");
+    buttonOrder.addEventListener("click", sendToLocalStorage)
+}
 
 function sendToLocalStorage(event){
     event.preventDefault()
@@ -449,32 +455,96 @@ function sendToLocalStorage(event){
                 products.push(product._id)
             })
 
-            let values = {
+            let sendValues = {
                 contact,
                 products,
             }
 
-            let sendValues = JSON.stringify(values)
-            console.log(sendValues)
-
-
-
-            const envoieAPI = fetch ("http://localhost:3000/api/cameras/order", {
-                method : "POST",
-                body : JSON.stringify(sendValues),
-                headers : {
-                            "content-type" : "application/json",
-                }
-            });
-            
-            console.log(sendValues);
+            return sendValues;
         }
     }
 
     sendAPI();
+
+    async function sendPost() {
+        const postData = await sendAPI()
+        
+        const response = await fetch ("http://localhost:3000/api/cameras/order", {
+            method : "POST",
+            body : JSON.stringify(postData),
+            headers : {
+                'Accept': 'application/json',
+                "content-type" : "application/json",
+            }
+        })
+        const data = await response.json()
+        sessionStorage.setItem("order", JSON.stringify(data))
+        console.log(sessionStorage)
+        window.location = "confirmation.html";
+        localStorage.clear();
+    }
+
+    sendPost();
 }
 
+const mainConfirm = document.getElementById("mainConfirm");
 
+function getOrder() {
+    if (mainConfirm != null) {
+        let order = JSON.parse(sessionStorage.getItem("order"));
+        console.log(order);
+        let priceToPay = 0
+        order.products.forEach(function(item) {
+            priceToPay += item.price
+        })
+        
+        mainConfirm.innerHTML=`
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h3>Récapitulatif de la commande :</h3>
+                <h4>Coordonnées :</h4>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Nom :</h5>
+                <p>${order.contact.lastName}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Prénom :</h5>
+                <p>${order.contact.firstName}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Adresse :</h5>
+                <p>${order.contact.address}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Mail :</h5>
+                <p>${order.contact.email}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Prix total :</h5>
+                <p>${parseInt(priceToPay / 100).toFixed(2) + ' €'}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 text-center">
+                <h5>Numéro de commande :</h5>
+                <p>${order.orderId}</p>
+            </div>
+        </div>`
+    } 
+}
+
+getOrder();
 
 
 //Préremplir le formulaire avec localStorage
@@ -502,14 +572,11 @@ preRemplirLesInputsAvecLocalStorage("cityOrder");
 preRemplirLesInputsAvecLocalStorage("emailOrder");
 
 
-    
 
 
 
-// Page de confirmation et envoie de formulaire
 
 
-// Check si le panier est vide
 
-// Envoie des données du formulaire à l'API
+
 
