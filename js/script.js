@@ -143,11 +143,23 @@ async function addToLocalStorage(){
     console.log("Le bouton marche");
     const allProducts = await getProducts()
 
-    cartProducts.push(allProducts)
-    localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts))
+    let optionChoice = document.getElementById("lensesProduct");
+    if(optionChoice.value == "-- Veuillez choisir la lentille --") {
+        alert("Veuillez choisir une lentille")
+    } else {
+        allProducts.lenses = optionChoice.value;
+        cartProducts.push(allProducts)
+
     
-    console.log('Ajout au panier réussi !')
-    console.log(cartProducts + " sont dans le panier")
+        localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts))
+        
+        
+        
+        console.log('Ajout au panier réussi !')
+        console.log(cartProducts + " sont dans le panier")
+    }
+
+
 }
 
 // Panier
@@ -155,38 +167,14 @@ async function addToLocalStorage(){
 
 const productCart = document.getElementById("sectionCart");
 
-
-if(document.readyState == 'loading'){
-    document.addEventListener("DOMContentLoaded", ready)
-} else {
-    ready()
-}
-
-function ready () {
-
-    cartItem()
-
-    let removeButton = document.getElementsByClassName("btn-danger");
-    for (let i = 0; i < removeButton.length; i++) {
-        let button = removeButton[i]
-        button.addEventListener("click", removeCartItem)
-    }
-
-    let quantityInputsProduct = document.getElementsByClassName("quantityProductCart")
-    for ( let i = 0; i < quantityInputsProduct.length; i++) {
-        let input = quantityInputsProduct[i] 
-        input.addEventListener("change", quantityChanged)
-    } 
-    
-}
-
 const productCartItem = document.getElementById("productCartItem");
 
 function cartItem() {
     if(cartProducts.length > 0 && productCartItem != null) {
 
-        console.log(cartProducts)
         for (i = 0; i < cartProducts.length; i++) {
+
+
             
             let rowCartItem = document.createElement("div");
             let colPictureProductCart = document.createElement("div");
@@ -215,7 +203,7 @@ function cartItem() {
             colTitleProductCart.appendChild(titleProductCart);
             titleProductCart.innerHTML = cartProducts[i].name;
             colTitleProductCart.appendChild(lensesProductCart);
-            lensesProductCart.innerHTML = cartProducts[i].lenses;
+            lensesProductCart.innerHTML = "Lentille : " + cartProducts[i].lenses;
             rowCartItem.appendChild(colSpace);
             colSpace.classList.add("col-1");
             rowCartItem.appendChild(colPriceProductCart);
@@ -237,9 +225,21 @@ function cartItem() {
             removeProductCart.classList.add("btn", "btn-danger");
             removeProductCart.setAttribute("type", "button");
             removeProductCart.innerHTML = "Supprimer"
+
+            const removeButton = document.querySelectorAll(".btn-danger");
+            removeButton.forEach(function(btn,i){
+                btn.addEventListener("click", function(){
+                    deleteItemSelected(i);
+                })
+            })
+
+            function deleteItemSelected (index) {
+                cartProducts.splice(index, 1);
+                localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts));
+            }
         }
 
-    } else if (cartProducts.length < 1) {
+    } else if (cartProducts.length < 1 && productCartItem != null) {
 
         let emptyCart = document.createElement("p");
 
@@ -251,39 +251,7 @@ function cartItem() {
 
 }
 
-
-function quantityChanged(event) {
-    let input = event.target
-    if (isNaN(input.value) || input.value <= 0) {
-        input.value = 1
-    }
-    updateCartTotal()
-}
-
-function removeCartItem(event){
-    let buttonClicked = event.target
-    buttonClicked.parentElement.parentElement.remove()
-    localStorage.removeItem("localStorageCartProducts")
-    console.log(localStorage)
-    updateCartTotal()
-}
-
-
-
-function updateCartTotal() {
-    let rowCarts = document.getElementsByClassName("rowCartItem")
-    let total = 0
-    for (let i = 0; i < rowCarts.length; i++) {
-        let rowCart = rowCarts[i]
-        let priceProductCart = rowCart.getElementsByClassName("priceProductCart")[0]
-        let quantityProductCart = rowCart.getElementsByClassName("quantityProductCart")[0]
-        let price = parseFloat(priceProductCart.innerText.replace("€", " "))
-        let quantity = quantityProductCart.value
-        total = total + (price * quantity)
-    }
-    total = Math.round(total * 100) / 100
-    document.getElementsByClassName("totalPriceCart")[0].innerText = total + "€"
-}
+cartItem();
 
 
 // Affichage formulaire
@@ -545,31 +513,6 @@ function getOrder() {
 }
 
 getOrder();
-
-
-//Préremplir le formulaire avec localStorage
-
-const dataLocalStorage = localStorage.getItem("contact");
-
-const dataLocalStorageJson = JSON.parse(dataLocalStorage)
-
-function preRemplirLesInputsAvecLocalStorage () {
-    if(dataLocalStorageJson == null) {
-        console.log("Le LocalStorage est vide")
-    } else {
-        document.querySelector("#firstNameOrder").value = dataLocalStorageJson.firstName;
-        document.querySelector("#lastNameOrder").value = dataLocalStorageJson.lastName;
-        document.querySelector("#adressOrder").value = dataLocalStorageJson.address;
-        document.querySelector("#cityOrder").value = dataLocalStorageJson.city;
-        document.querySelector("#emailOrder").value = dataLocalStorageJson.email;
-    }
-}
-
-preRemplirLesInputsAvecLocalStorage("firstNameOrder");
-preRemplirLesInputsAvecLocalStorage("lastNameOrder");
-preRemplirLesInputsAvecLocalStorage("adressOrder");
-preRemplirLesInputsAvecLocalStorage("cityOrder");
-preRemplirLesInputsAvecLocalStorage("emailOrder");
 
 
 
