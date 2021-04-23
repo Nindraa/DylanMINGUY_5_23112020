@@ -168,6 +168,8 @@ async function addToLocalStorage(){
 const productCart = document.getElementById("sectionCart");
 
 const productCartItem = document.getElementById("productCartItem");
+            
+let totalPrice = 0;
 
 function cartItem() {
     if(cartProducts.length > 0 && productCartItem != null) {
@@ -186,11 +188,14 @@ function cartItem() {
             let colSpace2 = document.createElement("div");
             let colPriceProductCart = document.createElement("div");
             let priceProductCart = document.createElement("h3");
+            let totalPriceProduct = document.createElement("p")
             let colQuantityProductCart = document.createElement("div");
             let quantityProductCart = document.createElement("input");
             let colRemoveProductCart = document.createElement("div");
             let removeProductCart = document.createElement("button");
-    
+
+            
+            
             productCartItem.appendChild(rowCartItem);
             rowCartItem.classList.add("row", "rowCartItem");
             rowCartItem.appendChild(colPictureProductCart);
@@ -209,8 +214,10 @@ function cartItem() {
             rowCartItem.appendChild(colPriceProductCart);
             colPriceProductCart.classList.add("col-2");
             colPriceProductCart.appendChild(priceProductCart);
-            priceProductCart.innerHTML = cartProducts[i].price;
-            priceProductCart.classList.add("priceProductCart")
+            priceProductCart.innerHTML = parseInt(cartProducts[i].price / 100).toFixed(2) + "€";
+            priceProductCart.classList.add("priceProductCart");
+            colPriceProductCart.appendChild(totalPriceProduct);
+            totalPriceProduct.classList.add("totalPriceProduct");
             rowCartItem.appendChild(colSpace2);
             colSpace2.classList.add("col-1");
             rowCartItem.appendChild(colQuantityProductCart);
@@ -218,13 +225,43 @@ function cartItem() {
             colQuantityProductCart.appendChild(quantityProductCart);
             quantityProductCart.classList.add("quantityProductCart");
             quantityProductCart.setAttribute("type", "number");
-            quantityProductCart.setAttribute("value", 1);
+            quantityProductCart.setAttribute("value", 2);
+            quantityProductCart.setAttribute("step", 1);
             rowCartItem.appendChild(colRemoveProductCart);
             colRemoveProductCart.classList.add("col-1", "text-right");
             colRemoveProductCart.appendChild(removeProductCart);
             removeProductCart.classList.add("btn", "btn-danger");
             removeProductCart.setAttribute("type", "button");
             removeProductCart.innerHTML = "Supprimer"
+
+            
+            
+            
+            
+            
+            let price = parseFloat(cartProducts[i].price)
+            
+            let prixLigne = function () {
+                let quantityInput = document.querySelectorAll(".quantityProductCart");
+                let totalProduct = price * parseFloat(quantityInput[i].value);
+                totalPriceProduct.innerHTML = (totalProduct/ 100).toFixed(2) + "€";
+                    quantityInput[i].addEventListener("change", function(event){
+                        let input = event.target
+                        if (isNaN(input.value) || input.value <= 0) {
+                            input.value = 1
+                            totalProduct = price * parseFloat(input.value)
+                            totalPriceProduct.innerHTML = (totalProduct / 100).toFixed(2)+ "€";
+                        } else {
+                            totalProduct = price * parseFloat(input.value)
+                            totalPriceProduct.innerHTML = (totalProduct / 100).toFixed(2) + "€";
+                        }
+                    })
+                    return totalProduct
+            }
+
+            
+
+
 
             const removeButton = document.querySelectorAll(".btn-danger");
             removeButton.forEach(function(btn,i){
@@ -237,6 +274,23 @@ function cartItem() {
                 cartProducts.splice(index, 1);
                 localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts));
             }
+
+
+            prixLigne();
+            let totalProductLine = prixLigne();
+            console.log(totalProductLine)
+
+
+            function updateCartTotal() {
+                console.log(totalPrice)
+                totalPrice += totalProductLine
+                let totalPriceCart = document.getElementById("totalPriceCart");
+                totalPriceCart.innerHTML = parseInt(totalPrice / 100).toFixed(2) + "€";
+        
+        
+            }
+        
+            updateCartTotal();
         }
 
     } else if (cartProducts.length < 1 && productCartItem != null) {
