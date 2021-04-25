@@ -280,13 +280,11 @@ function cartItem() {
 
             prixLigne();
             let totalProductLine = prixLigne();
-            console.log(totalProductLine)
             
              
 
             function updateCartTotal() {
                 let finalPrice = totalPrice += totalProductLine
-                console.log(finalPrice)
                 let total = document.getElementById("totalPriceCart");
                 total.innerHTML = parseInt(finalPrice / 100).toFixed(2) + "€";
             }
