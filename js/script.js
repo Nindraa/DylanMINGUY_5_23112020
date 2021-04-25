@@ -168,7 +168,7 @@ async function addToLocalStorage(){
 const productCart = document.getElementById("sectionCart");
 
 const productCartItem = document.getElementById("productCartItem");
-            
+
 let totalPrice = 0;
 
 function cartItem() {
@@ -192,7 +192,7 @@ function cartItem() {
             let colQuantityProductCart = document.createElement("div");
             let quantityProductCart = document.createElement("input");
             let colRemoveProductCart = document.createElement("div");
-            let removeProductCart = document.createElement("button");
+            let removeProductCart = document.createElement("input");
 
             
             
@@ -225,14 +225,15 @@ function cartItem() {
             colQuantityProductCart.appendChild(quantityProductCart);
             quantityProductCart.classList.add("quantityProductCart");
             quantityProductCart.setAttribute("type", "number");
-            quantityProductCart.setAttribute("value", 2);
+            quantityProductCart.setAttribute("value", 1);
             quantityProductCart.setAttribute("step", 1);
             rowCartItem.appendChild(colRemoveProductCart);
             colRemoveProductCart.classList.add("col-1", "text-right");
             colRemoveProductCart.appendChild(removeProductCart);
             removeProductCart.classList.add("btn", "btn-danger");
             removeProductCart.setAttribute("type", "button");
-            removeProductCart.innerHTML = "Supprimer"
+            removeProductCart.setAttribute("value", "Supprimer");
+
 
             
             
@@ -255,6 +256,7 @@ function cartItem() {
                             totalProduct = price * parseFloat(input.value)
                             totalPriceProduct.innerHTML = (totalProduct / 100).toFixed(2) + "€";
                         }
+                        updateCartTotal();
                     })
                     return totalProduct
             }
@@ -279,19 +281,21 @@ function cartItem() {
             prixLigne();
             let totalProductLine = prixLigne();
             console.log(totalProductLine)
-
+            
+             
 
             function updateCartTotal() {
-                console.log(totalPrice)
-                totalPrice += totalProductLine
-                let totalPriceCart = document.getElementById("totalPriceCart");
-                totalPriceCart.innerHTML = parseInt(totalPrice / 100).toFixed(2) + "€";
-        
-        
+                let finalPrice = totalPrice += totalProductLine
+                console.log(finalPrice)
+                let total = document.getElementById("totalPriceCart");
+                total.innerHTML = parseInt(finalPrice / 100).toFixed(2) + "€";
             }
-        
+
             updateCartTotal();
+
         }
+
+
 
     } else if (cartProducts.length < 1 && productCartItem != null) {
 
@@ -306,7 +310,6 @@ function cartItem() {
 }
 
 cartItem();
-
 
 // Affichage formulaire
 const affichageDuFormulaire = function () {
