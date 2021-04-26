@@ -50,7 +50,7 @@ async function getIndex() {
             indexCard.appendChild(indexLink);
             indexLink.classList.add("stretched-link")
             indexLink.appendChild(indexImg);
-            indexImg.classList.add("card-img-top");
+            indexImg.classList.add("card-img-top", "img-fluid");
             indexLink.appendChild(indexBodyCard);
             indexBodyCard.classList.add("card-body");
             indexBodyCard.appendChild(indexProductTitle)
@@ -65,7 +65,7 @@ async function getIndex() {
             indexCard.appendChild(indexLink);
             indexLink.classList.add("stretched-link")
             indexLink.appendChild(indexImg);
-            indexImg.classList.add("card-img-top");
+            indexImg.classList.add("card-img-top", "img-fluid");
             indexLink.appendChild(indexBodyCard);
             indexBodyCard.classList.add("card-body");
             indexBodyCard.appendChild(indexProductTitle)
@@ -140,7 +140,6 @@ if (document.getElementById("buttonProduct") != null) {
 
 
 async function addToLocalStorage(){
-    console.log("Le bouton marche");
     const allProducts = await getProducts()
 
     let optionChoice = document.getElementById("lensesProduct");
@@ -153,10 +152,7 @@ async function addToLocalStorage(){
     
         localStorage.setItem("localStorageCartProducts", JSON.stringify(cartProducts))
         
-        
-        
-        console.log('Ajout au panier réussi !')
-        console.log(cartProducts + " sont dans le panier")
+        alert("Le produit a été ajouter au panier.")
     }
 
 
